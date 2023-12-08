@@ -3,5 +3,6 @@
 
 #define DKEDLIST_OK 0
 #define DKEDLIST_ERR_ALLOC 1
+#define DKEDLIST_ILLEGAL_INDEX 2
 
 #endif
