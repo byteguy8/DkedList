@@ -8,10 +8,10 @@
  */
 struct _dkedlist_node_
 {
-    struct _dkedlist_node_ *prev;
-    struct _dkedlist_node_ *next;
-    struct _dkedlist_ *list;
-    void *data;
+    struct _dkedlist_node_ *prev; // The previous node (if any).
+    struct _dkedlist_node_ *next; // The next node (if any)
+    struct _dkedlist_ *list;      // The list of which this node belongs to
+    void *data;                   // The data inserted by the user. Could be NULL.
 };
 
 /**
