@@ -1,3 +1,5 @@
+// DkedList 1.0.0
+
 #ifndef _DKEDLIST_H_
 #define _DKEDLIST_H_
 
