@@ -4,6 +4,7 @@
 
 int _create_list_(void (*destroy_data)(void *data), struct _dkedlist_ **out_list)
 {
+    
     struct _dkedlist_ *list = (struct _dkedlist_ *)malloc(sizeof(struct _dkedlist_));
 
     if (!list)
@@ -252,11 +253,11 @@ struct _dkedlist_node_ *dkedlist_get_node(unsigned long index, struct _dkedlist_
     return node;
 }
 
-int dkedlist_reverse(struct _dkedlist_ *list)
+void dkedlist_reverse(struct _dkedlist_ *list)
 {
     if (list->size < 2)
     {
-        return DKEDLIST_OK;
+        return;
     }
 
     struct _dkedlist_node_ *head = list->head;
@@ -281,8 +282,6 @@ int dkedlist_reverse(struct _dkedlist_ *list)
 
     list->head = tail;
     list->tail = head;
-
-    return DKEDLIST_OK;
 }
 
 int dkedlist_join(void (*destroy_data)(void *data), struct _dkedlist_ *a_list, struct _dkedlist_ *b_list, struct _dkedlist_ **out_list)
@@ -335,7 +334,7 @@ FINISH:
 
 int dkedlist_sub_list(unsigned long from, unsigned long to, struct _dkedlist_ *list, struct _dkedlist_ **out_list)
 {
-    if (from > to || to < from)
+    if (from > to)
     {
         return DKEDLIST_ILLEGAL_INDEX;
     }
