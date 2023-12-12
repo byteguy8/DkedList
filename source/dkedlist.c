@@ -5,7 +5,7 @@
 
 int _create_list_(void (*destroy_data)(void *data), struct _dkedlist_ **out_list)
 {
-    assert(out_list || *out_list && "out_list can't be NULL");
+    assert((out_list || *out_list) && "out_list can't be NULL");
 
     struct _dkedlist_ *list = (struct _dkedlist_ *)malloc(sizeof(struct _dkedlist_));
 
@@ -48,7 +48,6 @@ int _create_node_(void *data, struct _dkedlist_ *list, struct _dkedlist_node_ **
 
 int _remove_node_(char clean_up, struct _dkedlist_node_ *node)
 {
-    assert(clean_up != 0 && clean_up != 1 && "clean_up value must be 0 (FALSE) or 1 (TRUE)");
     assert(node && "node can't be NULL");
 
     struct _dkedlist_ *list = node->list;
