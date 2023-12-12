@@ -1,6 +1,11 @@
 #ifndef _DKEDLIST_H_
 #define _DKEDLIST_H_
 
+/**
+ * @brief Structure representing
+ * every single node inside the list.
+ *
+ */
 struct _dkedlist_node_
 {
     struct _dkedlist_node_ *prev;
@@ -9,31 +14,63 @@ struct _dkedlist_node_
     void *data;
 };
 
+/**
+ * @brief Structure representing the list.
+ * This is a doubly linked list, meaning every
+ * node has a pointer to the previous node (if any)
+ * and another pointer to the next node (if any).
+ *
+ */
 struct _dkedlist_
 {
-    struct _dkedlist_node_ *head;
-    struct _dkedlist_node_ *tail;
-    void (*destroy_data)(void *data);
-    unsigned long size;
+    struct _dkedlist_node_ *head;     // The first node in the list.
+    struct _dkedlist_node_ *tail;     // The last node in the list.
+    void (*destroy_data)(void *data); // Function used to help users deallocated allocated resources inserted in the list.
+    unsigned long size;               // Numbers of nodes inside the list.
 };
 
+/**
+ * @brief Iterator used to iterate over the lsit
+ *
+ */
 struct _dkedlist_iter_
 {
-    char forward;
-    char initialized;
-    struct _dkedlist_ *list;
-    unsigned long current_indx;
-    struct _dkedlist_node_ *current_node;
+    char forward;                         // Specify if iterate forward or backward.
+    char initialized;                     // Used to determinate if the iter have just been created.
+    struct _dkedlist_ *list;              // The list over the iterator will iterate.
+    unsigned long current_indx;           // The current index of the iteration.
+    struct _dkedlist_node_ *current_node; // The current node of the iteration.
 };
 
 typedef struct _dkedlist_node_ DKedListNode;
 typedef struct _dkedlist_ DkedList;
 typedef struct _dkedlist_iter_ DkedListIter;
 
-int dkedlist_iter_create(char forward, struct _dkedlist_iter_ *iterator, struct _dkedlist_ *list);
+/**
+ * @brief Initialize a _dkedlist_iter_ structure with the information
+ * related to iterate the specified list.
+ *
+ * @param forward Specifiy if the iteration should be forward or backward.
+ * @param iterator Pointer to the iter to initialize. Must not be NULL.
+ * @param list Pointer to the list used by the iterator to iterate. Must not be NULL.
+ */
+void dkedlist_iter_create(char forward, struct _dkedlist_iter_ *iterator, struct _dkedlist_ *list);
 
-int dkedlist_iter_has_next(struct _dkedlist_iter_ *iterator);
+/**
+ * @brief Determinates if there is a next element remainig to iterate over.
+ *
+ * @param iterator _dkedlist_iter_ structure previously initialized with dkedlist_iter_create.
+ * @return 0 if there are no more nodes to iterate ver, 1 otherwise.
+ */
+int dkedlist_iter_has_next(struct _dkedlist_iter_ iterator);
 
+/**
+ * @brief Gets the next node in the iteration.
+ *
+ * @param iterator Pointer to a _dkedlist_iter_ struture previously initialized
+ * with dkedlist_iter_create. Must not be NULL.
+ * @return NULL if there are no more nodes to iterate over. struct _dkedlist_node_* otherwise.
+ */
 struct _dkedlist_node_ *dkedlist_iter_next(struct _dkedlist_iter_ *iterator);
 
 /**
@@ -129,19 +166,68 @@ int dkedlist_insert_next(void *data, struct _dkedlist_node_ *node, struct _dkedl
  */
 int dkedlist_insert_prev(void *data, struct _dkedlist_node_ *node, struct _dkedlist_node_ **out_node);
 
+/**
+ * @brief Removes a node from the list.
+ *
+ * @param node Pointer to pointer of the node to be removed. Must not be NULL.
+ * @param data Pointer to pointer in which the data in the node will
+ * be saved. Can be NULL.
+ */
 void dkedlist_remove(struct _dkedlist_node_ **node, void **data);
 
+/**
+ * @brief Removes a node from the list. This function calls the internal
+ * destroy_data function, which is used to help users deallocated allocated
+ * resources automatically when a node is remove from the list.
+ *
+ * @param node Pointer to pointer of the node to be removed. Must not be NULL.
+ */
 void dkedlist_remove_clean(struct _dkedlist_node_ **node);
 
+/**
+ * @brief Removes all nodes from the list.
+ *
+ * @param list Pointer to the list. Must not be NULL.
+ */
 void dkedlist_remove_all(struct _dkedlist_ *list);
 
+/**
+ * @brief Removes all nodes from the list. This function calls the internal
+ * destroy_data function, which is used to help users deallocated allocated
+ * resources automatically when a node is remove from the list.
+ *
+ * @param list
+ */
 void dkedlist_remove_all_clean(struct _dkedlist_ *list);
 
+/**
+ * @brief Destroys the list, deallocating every resource used for it.
+ *
+ * @param list Pointer to the list. Must not be NULL.
+ */
 void dkedlist_destroy(struct _dkedlist_ **list);
 
+/**
+ * @brief Destroys the list, deallocating every resource used for it.
+ * This function calls the internal destroy_data function, which is used
+ * to help users deallocated allocated
+ * resources automatically when a node is remove from the list.
+ * @param list Pointer to the list. Must not be NULL.
+ */
 void dkedlist_destroy_clean(struct _dkedlist_ **list);
 
+/**
+ * @brief Gets the first node from the list (if any).
+ * Returns NULL in case of list size equals to 0.
+ *
+ */
 #define dkedlist_first_node(list) (list->head)
+
+/**
+ * @brief Gets the last node from the list (if any).
+ * Returns NULL in case of list size equals to 0.
+ *
+ */
 #define dkedlist_last_node(list) (list->tail)
 
 #endif

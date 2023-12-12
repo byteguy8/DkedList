@@ -113,26 +113,26 @@ int _remove_all_nodes_(char clean_up, struct _dkedlist_ *list)
     }
 }
 
-int _validate_iter_(struct _dkedlist_iter_ *iterator)
+int _validate_iter_(struct _dkedlist_iter_ iterator)
 {
-    struct _dkedlist_ *list = iterator->list;
+    struct _dkedlist_ *list = iterator.list;
 
     if (list->size == 0)
     {
         return 0;
     }
 
-    if (iterator->initialized)
+    if (iterator.initialized)
     {
         return 1;
     }
 
-    if (iterator->forward && iterator->current_indx >= list->size - 1)
+    if (iterator.forward && iterator.current_indx >= list->size - 1)
     {
         return 0;
     }
 
-    if (!iterator->forward && iterator->current_indx == 0)
+    if (!iterator.forward && iterator.current_indx == 0)
     {
         return 0;
     }
@@ -140,7 +140,7 @@ int _validate_iter_(struct _dkedlist_iter_ *iterator)
     return 1;
 }
 
-int dkedlist_iter_create(char forward, struct _dkedlist_iter_ *iterator, struct _dkedlist_ *list)
+void dkedlist_iter_create(char forward, struct _dkedlist_iter_ *iterator, struct _dkedlist_ *list)
 {
     if (forward)
     {
@@ -155,11 +155,9 @@ int dkedlist_iter_create(char forward, struct _dkedlist_iter_ *iterator, struct 
     iterator->current_node = NULL;
     iterator->forward = forward;
     iterator->list = list;
-
-    return DKEDLIST_OK;
 }
 
-int dkedlist_iter_has_next(struct _dkedlist_iter_ *iterator)
+int dkedlist_iter_has_next(struct _dkedlist_iter_ iterator)
 {
     return _validate_iter_(iterator);
 }
@@ -168,7 +166,7 @@ struct _dkedlist_node_ *dkedlist_iter_next(struct _dkedlist_iter_ *iterator)
 {
     struct _dkedlist_ *list = iterator->list;
 
-    int has_next = _validate_iter_(iterator);
+    int has_next = _validate_iter_(*iterator);
 
     if (!has_next)
     {
@@ -246,7 +244,7 @@ struct _dkedlist_node_ *dkedlist_get_node(unsigned long index, struct _dkedlist_
 
     dkedlist_iter_create(forward, &iter, list);
 
-    while (dkedlist_iter_has_next(&iter))
+    while (dkedlist_iter_has_next(iter))
     {
         struct _dkedlist_node_ *current = dkedlist_iter_next(&iter);
 
@@ -303,7 +301,7 @@ int dkedlist_join(void (*destroy_data)(void *data), struct _dkedlist_ *a_list, s
 
     dkedlist_iter_create(1, &iter, a_list);
 
-    while (dkedlist_iter_has_next(&iter))
+    while (dkedlist_iter_has_next(iter))
     {
         struct _dkedlist_node_ *node = dkedlist_iter_next(&iter);
         void *raw_data = node->data;
@@ -316,7 +314,7 @@ int dkedlist_join(void (*destroy_data)(void *data), struct _dkedlist_ *a_list, s
 
     dkedlist_iter_create(1, &iter, b_list);
 
-    while (dkedlist_iter_has_next(&iter))
+    while (dkedlist_iter_has_next(iter))
     {
         struct _dkedlist_node_ *node = dkedlist_iter_next(&iter);
         void *raw_data = node->data;
@@ -361,7 +359,7 @@ int dkedlist_sub_list(unsigned long from, unsigned long to, struct _dkedlist_ *l
 
     dkedlist_iter_create(1, &iter, list);
 
-    while (dkedlist_iter_has_next(&iter))
+    while (dkedlist_iter_has_next(iter))
     {
         struct _dkedlist_node_ *node = dkedlist_iter_next(&iter);
         void *raw_data = node->data;
