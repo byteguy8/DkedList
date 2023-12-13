@@ -25,10 +25,10 @@ struct _dkedlist_node_
  */
 struct _dkedlist_
 {
+    unsigned long size;               // Numbers of nodes inside the list.
     struct _dkedlist_node_ *head;     // The first node in the list.
     struct _dkedlist_node_ *tail;     // The last node in the list.
     void (*destroy_data)(void *data); // Function used to help users deallocated allocated resources inserted in the list.
-    unsigned long size;               // Numbers of nodes inside the list.
 };
 
 /**
