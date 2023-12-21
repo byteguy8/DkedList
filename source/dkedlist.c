@@ -3,11 +3,19 @@
 #include <stdlib.h>
 #include <assert.h>
 
+void _custom_dealloc_(unsigned long size, void *ptr)
+{
+    free(ptr);
+}
+
+static void *(*dkedlist_allocate)(unsigned long size) = malloc;
+static void (*dkedlist_deallocte)(unsigned long size, void *ptr) = _custom_dealloc_;
+
 int _create_list_(void (*destroy_data)(void *data), struct _dkedlist_ **out_list)
 {
     assert((out_list || *out_list) && "out_list can't be NULL");
 
-    struct _dkedlist_ *list = (struct _dkedlist_ *)malloc(sizeof(struct _dkedlist_));
+    struct _dkedlist_ *list = (struct _dkedlist_ *)dkedlist_allocate(sizeof(struct _dkedlist_));
 
     if (!list)
     {
@@ -29,7 +37,7 @@ int _create_node_(void *data, struct _dkedlist_ *list, struct _dkedlist_node_ **
     assert(list && "list can't be NULL");
     assert(out_node || *out_node && "out_node can't be NULL");
 
-    struct _dkedlist_node_ *node = (struct _dkedlist_node_ *)malloc(sizeof(struct _dkedlist_node_));
+    struct _dkedlist_node_ *node = (struct _dkedlist_node_ *)dkedlist_allocate(sizeof(struct _dkedlist_node_));
 
     if (!node)
     {
@@ -86,7 +94,7 @@ int _remove_node_(char clean_up, struct _dkedlist_node_ *node)
     node->prev = NULL;
     node->list = NULL;
 
-    free(node);
+    dkedlist_deallocte(sizeof(struct _dkedlist_node_), node);
 
     list->size = list->size - 1;
 
@@ -111,6 +119,25 @@ int _remove_all_nodes_(char clean_up, struct _dkedlist_ *list)
 
         current = next;
     }
+}
+
+void _destroy_list_(int clean_up, struct _dkedlist_ **list)
+{
+    if (!list || !(*list))
+    {
+        return;
+    }
+
+    _remove_all_nodes_(clean_up, *list);
+
+    (*list)->destroy_data = NULL;
+    (*list)->head = NULL;
+    (*list)->tail = NULL;
+    (*list)->size = 0;
+
+    dkedlist_deallocte(sizeof(struct _dkedlist_), *list);
+
+    *list = NULL;
 }
 
 int _validate_iter_(struct _dkedlist_iter_ iterator)
@@ -138,6 +165,28 @@ int _validate_iter_(struct _dkedlist_iter_ iterator)
     }
 
     return 1;
+}
+
+void dkedlist_set_malloc(void *(*dkedlist_malloc)(unsigned long size))
+{
+    if (dkedlist_malloc)
+    {
+        dkedlist_allocate = dkedlist_malloc;
+        return;
+    }
+
+    dkedlist_allocate = malloc;
+}
+
+void dkedlist_set_free(void (*dkedlist_free)(unsigned long size, void *ptr))
+{
+    if (dkedlist_free)
+    {
+        dkedlist_deallocte = dkedlist_free;
+        return;
+    }
+
+    dkedlist_deallocte = _custom_dealloc_;
 }
 
 void dkedlist_iter_create(char forward, struct _dkedlist_iter_ *iterator, struct _dkedlist_ *list)
@@ -514,38 +563,10 @@ void dkedlist_remove_all_clean(struct _dkedlist_ *list)
 
 void dkedlist_destroy(struct _dkedlist_ **list)
 {
-    if (!list || !(*list))
-    {
-        return;
-    }
-
-    _remove_all_nodes_(0, *list);
-
-    (*list)->destroy_data = NULL;
-    (*list)->head = NULL;
-    (*list)->tail = NULL;
-    (*list)->size = 0;
-
-    free(*list);
-
-    *list = NULL;
+    _destroy_list_(0, list);
 }
 
 void dkedlist_destroy_clean(struct _dkedlist_ **list)
 {
-    if (!list || !(*list))
-    {
-        return;
-    }
-
-    _remove_all_nodes_(1, *list);
-
-    (*list)->destroy_data = NULL;
-    (*list)->head = NULL;
-    (*list)->tail = NULL;
-    (*list)->size = 0;
-
-    free(*list);
-
-    *list = NULL;
+    _destroy_list_(1, list);
 }

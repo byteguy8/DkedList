@@ -1,4 +1,4 @@
-// DkedList 1.0.0
+// DkedList 1.1.0
 
 #ifndef _DKEDLIST_H_
 #define _DKEDLIST_H_
@@ -47,6 +47,10 @@ struct _dkedlist_iter_
 typedef struct _dkedlist_node_ DKedListNode;
 typedef struct _dkedlist_ DkedList;
 typedef struct _dkedlist_iter_ DkedListIter;
+
+void dkedlist_set_malloc(void *(*dkedlist_malloc)(unsigned long size));
+
+void dkedlist_set_free(void(*dkedlist_free)(unsigned long size, void *ptr));
 
 /**
  * @brief Initialize a _dkedlist_iter_ structure with the information
